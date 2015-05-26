@@ -9,7 +9,7 @@ Feel free to use, share and contribute.
 
 ## Thank you note
 
-[Nick Cammorato](https://github.com/cammoraton) performed the hard work. He created the scripts I've have as a base. You can find them [here](https://github.com/cammoraton/confluence-package-deb) creating a nice Tomcat 6 instance for you.
+[Nick Cammorato](https://github.com/cammoraton) has done the hard work. He created the scripts I've have as a base. You can find them [here](https://github.com/cammoraton/confluence-package-deb) creating a nice Tomcat 6 instance for you.
 
 ## Requirements
 
