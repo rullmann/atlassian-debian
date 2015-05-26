@@ -1,0 +1,3 @@
+opt/confluence
+var/opt/confluence
+etc/logrotate.d

@@ -1,0 +1,64 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+TEMPLATE="/opt/confluence/defaults.template"
+CONFFILE="/etc/default/confluence"
+LR_TEMPLATE="/opt/confluence/logrotate.template"
+LR_CONFFILE="/etc/logrotate.d/confluence"
+
+case "$1" in
+    configure)
+
+	# Generate $CONFFILE from debconf settings and $TEMPLATE
+	db_version 2.0
+	db_get confluence/username && CONFLUENCE_USER="$RET" || CONFLUENCE_USER="confluence"
+	db_get confluence/groupname && CONFLUENCE_GROUP="$RET" || CONFLUENCE_GROUP="confluence"
+
+	tmpfile=`mktemp /tmp/confluence.XXXXXXXXXX`
+	chmod 644 $tmpfile
+	cat $TEMPLATE \
+		| sed "s%^CONFLUENCE_USER=.*$%CONFLUENCE_USER=$CONFLUENCE_USER%" \
+		| sed "s%^CONFLUENCE_GROUP=.*$%CONFLUENCE_GROUP=$CONFLUENCE_GROUP%" \
+		>> $tmpfile
+	ucf --debconf-ok --sum-file /opt/confluence/defaults.md5sum $tmpfile $CONFFILE
+	rm -f $tmpfile
+
+	if ! getent group "$CONFLUENCE_GROUP" > /dev/null 2>&1 ; then
+	    addgroup --system "$CONFLUENCE_GROUP" --quiet
+	fi
+	if ! id $CONFLUENCE_USER > /dev/null 2>&1 ; then
+	    adduser --system --home /opt/confluence --no-create-home \
+		--ingroup "$CONFLUENCE_GROUP" --disabled-password --shell /bin/bash \
+		"$CONFLUENCE_USER"
+	fi
+	mkdir -p /opt/confluence
+	mkdir -p /etc/confluence
+	mkdir -p /var/opt/confluence
+	chown -Rh $CONFLUENCE_USER:$CONFLUENCE_GROUP /var/opt/confluence 
+	chmod 750 /var/opt/confluence
+
+	# populate /etc/logrotate.d/confluence
+	tmpfile=`mktemp /tmp/confluence.XXXXXXXXXX`
+	chmod 644 $tmpfile
+	cat $LR_TEMPLATE | sed "s%create 640 confluence adm%create 640 $CONFLUENCE_USER $CONFLUENCE_GROUP%" >> $tmpfile
+	ucf --debconf-ok --sum-file /opt/confluence/logrotate.md5sum $tmpfile $LR_CONFFILE
+	rm -f $tmpfile
+
+	# configuration files should not be modifiable by confluence user, as this can be a security issue
+	# (an attacker may insert code in a webapp and have access to all tomcat configuration)
+	# but those files should be readable by confluence, so we set the group to confluence
+	chown -Rh root:$CONFLUENCE_GROUP /etc/confluence
+	chown -Rh root:$CONFLUENCE_GROUP /opt/confluence
+	chown -Rh $CONFLUENCE_USER /opt/confluence/logs
+        chown -Rh $CONFLUENCE_USER /opt/confluence/temp
+        chown -Rh $CONFLUENCE_USER /opt/confluence/work
+
+	# Install Oracle JRE
+	sh /opt/confluence/oracle_java_install.sh 8
+    ;;
+esac
+
+exit 0
+
+#DEBHELPER#

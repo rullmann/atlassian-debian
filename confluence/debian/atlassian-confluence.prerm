@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove)
+	[ -f /etc/default/confluence ] && . /etc/default/confluence
+	[ -z "$CONFLUENCE_USER" ] && CONFLUENCE_USER="confluence"
+    ;;
+esac
+
+#DEBHELPER#

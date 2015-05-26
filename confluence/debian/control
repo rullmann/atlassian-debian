@@ -1,0 +1,19 @@
+Source: atlassian-confluence
+Section: web
+Priority: optional
+Maintainer: Rico Ullmann <rico@erinnerungsfragmente.de>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.5
+Homepage: https://www.atlassian.com/software/confluence
+
+Package: atlassian-confluence
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: Atlassian Confluence
+ The enterprise wiki.
+ .
+ Confluence is a wiki used by more than half of Fortune 100 companies to connect people with the content
+ and co-workers they need to get their jobs done, faster.
+ .
+ Connect your entire business in one place online to collaborate and capture knowledge - create, share, and discuss
+ your documents, ideas, minutes, and projects.

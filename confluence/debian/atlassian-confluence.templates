@@ -1,0 +1,15 @@
+Template: confluence/username
+Type: string
+Default: confluence
+Description: Dedicated system account for the confluence:
+ Confluence runs within a tomcat server and must use a dedicated account for 
+ its operation so that the system's security is not compromised by running it 
+ with superuser privileges.
+
+Template: confluence/groupname
+Type: string
+Default: confluence
+Description: Dedicated system group for confluence:
+ Confluence runs within tomcat server and must use a dedicated group for its 
+ operation so that the system's security is not compromised by running it with 
+ superuser privileges.
