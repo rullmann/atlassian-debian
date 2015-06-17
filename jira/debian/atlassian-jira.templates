@@ -1,0 +1,15 @@
+Template: jira/username
+Type: string
+Default: jira
+Description: Dedicated system account for the jira:
+ JIRA runs within a tomcat server and must use a dedicated account for 
+ its operation so that the system's security is not compromised by running it 
+ with superuser privileges.
+
+Template: jira/groupname
+Type: string
+Default: jira
+Description: Dedicated system group for jira:
+ JIRA runs within tomcat server and must use a dedicated group for its 
+ operation so that the system's security is not compromised by running it with 
+ superuser privileges.

@@ -1,0 +1,8 @@
+/opt/confluence/log/catalina.out {
+  copytruncate
+  weekly
+  rotate 52
+  compress
+  missingok
+  create 640 confluence root
+}

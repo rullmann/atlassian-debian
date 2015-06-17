@@ -1,0 +1,3 @@
+opt/jira
+var/opt/jira
+etc/logrotate.d

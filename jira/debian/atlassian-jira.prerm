@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove)
+	[ -f /etc/default/jira ] && . /etc/default/jira
+	[ -z "$JIRA_USER" ] && JIRA_USER="jira"
+    ;;
+esac
+
+#DEBHELPER#

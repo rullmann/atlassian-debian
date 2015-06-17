@@ -1,0 +1,8 @@
+# User and group to run jira as. Leaving them empty
+# will cause it to default to jira
+JIRA_USER=jira
+JIRA_GROUP=jira
+
+# Unset LC_ALL to prevent user environment executing the init script from
+# influencing servlet behavior. See Debian bug #645221
+unset LC_ALL

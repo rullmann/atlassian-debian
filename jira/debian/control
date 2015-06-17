@@ -1,0 +1,15 @@
+Source: atlassian-jira
+Section: web
+Priority: optional
+Maintainer: Rico Ullmann <rico@erinnerungsfragmente.de>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.5
+Homepage: https://www.atlassian.com/software/jira
+
+Package: atlassian-jira
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: Atlassian JIRA
+ JIRA is built for every member of your software team.
+ .
+ Plan and track your work while moving towards the next release.

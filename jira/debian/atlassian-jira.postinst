@@ -1,0 +1,64 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+TEMPLATE="/opt/jira/defaults.template"
+CONFFILE="/etc/default/jira"
+LR_TEMPLATE="/opt/jira/logrotate.template"
+LR_CONFFILE="/etc/logrotate.d/jira"
+
+case "$1" in
+    configure)
+
+	# Generate $CONFFILE from debconf settings and $TEMPLATE
+	db_version 2.0
+	db_get jira/username && JIRA_USER="$RET" || JIRA_USER="jira"
+	db_get jira/groupname && JIRA_GROUP="$RET" || JIRA_GROUP="jira"
+
+	tmpfile=`mktemp /tmp/jira.XXXXXXXXXX`
+	chmod 644 $tmpfile
+	cat $TEMPLATE \
+		| sed "s%^JIRA_USER=.*$%JIRA_USER=$JIRA_USER%" \
+		| sed "s%^JIRA_GROUP=.*$%JIRA_GROUP=$JIRA_GROUP%" \
+		>> $tmpfile
+	ucf --debconf-ok --sum-file /opt/jira/defaults.md5sum $tmpfile $CONFFILE
+	rm -f $tmpfile
+
+	if ! getent group "$JIRA_GROUP" > /dev/null 2>&1 ; then
+	    addgroup --system "$JIRA_GROUP" --quiet
+	fi
+	if ! id $JIRA_USER > /dev/null 2>&1 ; then
+	    adduser --system --home /opt/jira --no-create-home \
+		--ingroup "$JIRA_GROUP" --disabled-password --shell /bin/bash \
+		"$JIRA_USER"
+	fi
+	mkdir -p /opt/jira
+	mkdir -p /etc/jira
+	mkdir -p /var/opt/jira
+	chown -Rh $JIRA_USER:$JIRA_GROUP /var/opt/jira 
+	chmod 750 /var/opt/jira
+
+	# populate /etc/logrotate.d/jira
+	tmpfile=`mktemp /tmp/jira.XXXXXXXXXX`
+	chmod 644 $tmpfile
+	cat $LR_TEMPLATE | sed "s%create 640 jira adm%create 640 $JIRA_USER $JIRA_GROUP%" >> $tmpfile
+	ucf --debconf-ok --sum-file /opt/jira/logrotate.md5sum $tmpfile $LR_CONFFILE
+	rm -f $tmpfile
+
+	# configuration files should not be modifiable by jira user, as this can be a security issue
+	# (an attacker may insert code in a webapp and have access to all tomcat configuration)
+	# but those files should be readable by jira, so we set the group to jira
+	chown -Rh root:$JIRA_GROUP /etc/jira
+	chown -Rh root:$JIRA_GROUP /opt/jira
+	chown -Rh $JIRA_USER /opt/jira/logs
+        chown -Rh $JIRA_USER /opt/jira/temp
+        chown -Rh $JIRA_USER /opt/jira/work
+
+	# Install Oracle JRE
+	sh /opt/jira/oracle_java_install.sh 8
+    ;;
+esac
+
+exit 0
+
+#DEBHELPER#
