@@ -197,4 +197,4 @@ md5sum logrotate.template > logrotate.md5sum
 
 # Let's build!
 cd $CONFLUENCE_DIR
-dpkg-buildpackage -S -uc
+dpkg-buildpackage -us -uc
